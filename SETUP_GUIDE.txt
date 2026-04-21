@@ -1,0 +1,353 @@
+# GAMEVAULT — Complete Setup Guide
+# Next.js + Supabase + Vercel
+# ============================================================
+
+## WHAT YOU'LL NEED
+- A computer with internet
+- Node.js 18+ (free) → nodejs.org
+- Git (free) → git-scm.com
+- A GitHub account (free) → github.com
+- A Supabase account (free) → supabase.com
+- A Vercel account (free) → vercel.com
+
+---
+
+## STEP 1 — Install Node.js
+
+1. Go to https://nodejs.org
+2. Download the "LTS" version
+3. Install it (just click Next > Next > Finish)
+4. Open a terminal (Command Prompt on Windows, Terminal on Mac)
+5. Type: node --version
+   → Should show something like v20.x.x ✅
+
+---
+
+## STEP 2 — Set Up Supabase Database
+
+1. Go to https://supabase.com → Sign Up (free)
+2. Click "New Project"
+   - Name: gamevault
+   - Database Password: pick a strong one (save it somewhere!)
+   - Region: pick closest to you (e.g. Europe West for Egypt)
+   - Click "Create new project"
+3. Wait 1-2 minutes for it to set up
+
+4. Go to SQL Editor (left sidebar → looks like a database icon)
+5. Click "New Query"
+6. Open the file: supabase/schema.sql from this project
+7. Copy ALL the text and paste it into the SQL editor
+8. Click "Run" (green button)
+   → You should see "Success. No rows returned" ✅
+   → This creates your tables and adds 20 sample products
+
+9. Go to Settings → API (left sidebar)
+10. You'll see 3 values you need — copy each one:
+    ┌─────────────────────────────────────────────────────┐
+    │  Project URL         → NEXT_PUBLIC_SUPABASE_URL     │
+    │  anon / public key   → NEXT_PUBLIC_SUPABASE_ANON_KEY│
+    │  service_role key    → SUPABASE_SERVICE_ROLE_KEY    │
+    └─────────────────────────────────────────────────────┘
+    ⚠️  NEVER share the service_role key — it bypasses all security!
+
+---
+
+## STEP 3 — Set Up the Project
+
+1. Open your terminal and go to where you want to save the project:
+   cd Desktop   (or wherever you want)
+
+2. Extract the gamevault zip file there
+
+3. Go into the project folder:
+   cd gamevault
+
+4. Create your environment file:
+   → On Mac/Linux:  cp .env.local.example .env.local
+   → On Windows:    copy .env.local.example .env.local
+
+5. Open .env.local in any text editor (Notepad, VS Code, etc.)
+   Paste your 3 Supabase values:
+
+   NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
+   SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
+   ADMIN_PASSWORD=your_secure_password_here
+
+   Save the file.
+
+6. Install dependencies:
+   npm install
+   (This downloads ~200MB of packages — takes 1-3 minutes)
+
+7. Run the development server:
+   npm run dev
+
+8. Open your browser and go to: http://localhost:3000
+   → You should see the GAMEVAULT store! ✅
+
+9. Go to: http://localhost:3000/admin
+   → Enter the ADMIN_PASSWORD you set in .env.local
+   → You should see the admin dashboard! ✅
+
+---
+
+## STEP 4 — Deploy to Vercel (Make it Live Online)
+
+### 4a — Push to GitHub
+
+1. Install GitHub CLI or use GitHub Desktop, OR:
+
+2. Create a new repo on https://github.com → "New repository"
+   - Name: gamevault
+   - Private ✓ (recommended)
+   - Click "Create repository"
+
+3. In your terminal, inside the gamevault folder:
+
+   git init
+   git add .
+   git commit -m "Initial GAMEVAULT commit"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/gamevault.git
+   git push -u origin main
+
+   (Replace YOUR_USERNAME with your GitHub username)
+
+### 4b — Deploy on Vercel
+
+1. Go to https://vercel.com → Sign Up with GitHub
+
+2. Click "Add New..." → "Project"
+
+3. Find your "gamevault" repo → click "Import"
+
+4. In the configuration screen:
+   - Framework Preset: Next.js (auto-detected) ✅
+   - Root Directory: ./ (leave as-is)
+
+5. Click "Environment Variables" and add ALL of these:
+
+   Name                          Value
+   ─────────────────────────────────────────────────────────
+   NEXT_PUBLIC_SUPABASE_URL      https://xxxx.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY eyJhbG...your anon key
+   SUPABASE_SERVICE_ROLE_KEY     eyJhbG...your service key
+   ADMIN_PASSWORD                your_secure_password
+   TELEGRAM_BOT_TOKEN            (optional - see Step 6)
+   TELEGRAM_CHAT_ID              (optional - see Step 6)
+
+6. Click "Deploy"
+   → Wait 2-3 minutes
+
+7. Vercel will give you a URL like: https://gamevault-abc123.vercel.app
+   → This is your LIVE website! ✅
+
+### 4c — Add a Custom Domain (Optional)
+
+1. In Vercel project → Settings → Domains
+2. Add your domain (e.g. gamevault.store)
+3. Follow the DNS instructions Vercel shows you
+
+---
+
+## STEP 5 — Use the Admin Panel
+
+### Access
+URL:      https://yoursite.vercel.app/admin
+Password: Whatever you set in ADMIN_PASSWORD
+
+### Dashboard (/admin/dashboard)
+- See total revenue, order count, pending orders
+- View last 6 orders
+- See order status breakdown bar chart
+- Quick links to add product or view pending orders
+
+### Orders (/admin/orders)
+- See ALL orders in a table
+- Click any row to expand and see full item list + customer notes
+- Filter by status: All / Pending / Processing / Completed / Cancelled
+- Change order status: use the dropdown → click ✓
+- Paginated (20 per page)
+
+### Products (/admin/products)
+- See all products in a table with image previews
+- Search products by name or category
+- Add product: click "+ Add Product" → fill the form → "Add Product"
+- Edit product: click the pencil icon → form pre-fills → "Save Changes"
+- Hide/Show: click the eye icon (keeps product in DB but hides from store)
+- Delete: click the trash icon → confirm dialog appears
+
+### Product Fields
+  Name        → Full product name
+  Category    → Steam / PlayStation / Xbox / etc.
+  Platform    → Steam / PS5 / Valorant / etc. (shown on card)
+  Price       → Current price in EGP
+  Old Price   → Original price (shows strikethrough + % off badge)
+  Badge       → Hot / New / Sale / Ltd
+  Region      → Global / EU / NA / ME / UAE / EGY / USA / TR
+  Stock       → Units available (999 = unlimited)
+  Image URL   → Direct link to product cover art
+  Description → Full product description
+  Active      → Toggle on/off = visible/hidden in store
+
+---
+
+## STEP 6 — Set Up Telegram Order Notifications (Optional)
+
+1. Open Telegram on your phone
+2. Search for: @BotFather
+3. Send the message: /newbot
+4. Follow the instructions:
+   - Give your bot a name: "GAMEVAULT Orders"
+   - Give it a username: gamevault_orders_bot (must end in _bot)
+5. BotFather sends you a TOKEN → copy it
+
+6. Get your Chat ID:
+   Option A (Personal DMs):
+   - Start a chat with your new bot (search it)
+   - Send any message to it
+   - Visit: https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+   - Look for "chat":{"id": 123456789} → that's your chat ID
+
+   Option B (Group):
+   - Create a Telegram group
+   - Add your bot to the group
+   - Visit the getUpdates URL above
+   - The chat ID will be a negative number like -100123456789
+
+7. Add to Vercel environment variables:
+   TELEGRAM_BOT_TOKEN = 123456789:ABCdefGHIjklMNOpqrSTUvwxYZ
+   TELEGRAM_CHAT_ID   = 123456789 (or -100123456789 for group)
+
+8. Redeploy: go to Vercel → your project → Deployments → Redeploy
+
+Now every new order will send a message like:
+  🎮 NEW ORDER — GV-A1B2C3D4
+  👤 Customer: Ahmed Mohamed
+  📧 Email: ahmed@example.com
+  🛒 Items:
+    • Elden Ring — STEAM KEY ×1 — 1200.00 EGP
+  💰 Subtotal: 1200.00 EGP
+  🚚 Shipping: FREE
+  ✅ TOTAL: 1200.00 EGP
+
+---
+
+## STEP 7 — Customize Your Store
+
+### Change store name
+1. In app/layout.tsx → find "GAMEVAULT" → replace
+2. In components/Navbar.tsx → find "GAMEVAULT" → replace
+3. Redeploy
+
+### Change accent color
+In app/globals.css, find:
+  (using Tailwind config, change in tailwind.config.ts)
+
+  accent:  '#00D4FF'  ← Main cyan color
+  accent2: '#7C3AED'  ← Purple
+  red:     '#EF4444'  ← Badges + discounts
+
+### Change hero text
+In app/page.tsx, find:
+  LEVEL<br />UP YOUR<br /><span ...>GAME</span>
+Change to anything you want.
+
+### Change shipping
+In lib/supabase.ts:
+  export const FREE_SHIPPING_MIN = 2000;  ← Min for free shipping
+  export const SHIPPING_COST = 100;       ← Fee in EGP
+
+### Change admin password
+In Vercel → your project → Settings → Environment Variables
+→ Edit ADMIN_PASSWORD → Redeploy
+
+### Add products
+Easiest: use the Admin Panel → Products → Add Product
+
+---
+
+## UPDATING THE SITE
+
+After making code changes:
+  git add .
+  git commit -m "your description of changes"
+  git push
+
+→ Vercel automatically redeploys in ~2 minutes! ✅
+
+---
+
+## FILE STRUCTURE SUMMARY
+
+  gamevault/
+  ├── app/
+  │   ├── page.tsx                    Homepage
+  │   ├── layout.tsx                  Root layout (Navbar, Footer)
+  │   ├── globals.css                 Gaming dark theme
+  │   ├── products/page.tsx           Shop page (filters + search)
+  │   ├── admin/
+  │   │   ├── page.tsx                Admin login
+  │   │   ├── layout.tsx              Admin sidebar layout
+  │   │   ├── dashboard/page.tsx      Stats + recent orders
+  │   │   ├── orders/page.tsx         Order management
+  │   │   └── products/page.tsx       Product CRUD
+  │   └── api/
+  │       ├── orders/route.ts         POST checkout → save order
+  │       └── admin/
+  │           ├── auth/route.ts       Login / logout / verify
+  │           ├── orders/route.ts     GET orders, PATCH status
+  │           ├── products/route.ts   CRUD products
+  │           └── stats/route.ts      Dashboard stats
+  ├── components/
+  │   ├── Navbar.tsx                  Sticky header + cart button
+  │   ├── ProductCard.tsx             Game card with add-to-cart
+  │   ├── CartDrawer.tsx              Slide-in cart drawer
+  │   ├── CheckoutModal.tsx           Checkout form + success
+  │   ├── CountdownClient.tsx         Flash sale countdown timer
+  │   └── Toaster.tsx                 Toast notifications
+  ├── lib/
+  │   ├── supabase.ts                 Supabase clients
+  │   └── store.ts                   Zustand cart (persisted)
+  ├── types/index.ts                  TypeScript types
+  ├── supabase/schema.sql             DB setup + 20 sample products
+  └── .env.local.example             Env vars template
+
+---
+
+## COMMON ERRORS & FIXES
+
+❌ "Invalid API key" or "Missing Supabase URL"
+   → Check .env.local has no typos, no extra spaces
+   → Make sure you copied the full key (they're very long)
+
+❌ "relation products does not exist"
+   → You haven't run schema.sql yet
+   → Go to Supabase → SQL Editor → paste schema.sql → Run
+
+❌ "Unauthorized" on admin pages
+   → Make sure ADMIN_PASSWORD is set in .env.local
+   → Clear your browser cookies and try again
+
+❌ Products page shows 0 products
+   → Check Supabase → Table Editor → products → rows exist?
+   → Check RLS policies — run schema.sql again to recreate them
+
+❌ Images not loading
+   → The product images use IGDB CDN which may block some requests
+   → Replace image_url with your own hosted images
+
+❌ npm install fails
+   → Make sure Node.js 18+ is installed: node --version
+   → Try: npm install --legacy-peer-deps
+
+---
+
+## SUPPORT
+
+If you get stuck on any step, the error message usually tells you
+exactly what's wrong. Google the error message + "Next.js" or
+"Supabase" — the community is huge and most issues are solved.
+
+Good luck with your store! 🎮

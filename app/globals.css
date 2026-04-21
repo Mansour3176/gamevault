@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;700;800&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-heading: 'Oxanium', sans-serif;
+  --font-body: 'Rajdhani', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #080B10;
+  color: #CBD5E1;
+  font-family: 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── TYPOGRAPHY ─────────────────────────── */
+.font-heading { font-family: 'Oxanium', sans-serif; }
+
+/* ─── TICKER ─────────────────────────────── */
+.ticker-track {
+  display: flex;
+  gap: 60px;
+  white-space: nowrap;
+  animation: ticker 25s linear infinite;
+  width: max-content;
+}
+.ticker-track span::before { content: '⚡ '; }
+
+@keyframes ticker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── HERO GRID ──────────────────────────── */
+.hero-grid-bg {
+  background-image:
+    linear-gradient(rgba(0,212,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── GLOW ───────────────────────────────── */
+.glow { box-shadow: 0 0 30px rgba(0,212,255,.25); }
+.glow-sm { box-shadow: 0 0 15px rgba(0,212,255,.15); }
+.text-glow { text-shadow: 0 0 20px rgba(0,212,255,.5); }
+
+/* ─── SCROLLBAR ──────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0D1117; }
+::-webkit-scrollbar-thumb { background: #1E2836; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00D4FF; }
+
+/* ─── CART DRAWER ────────────────────────── */
+.cart-drawer-enter  { transform: translateX(100%); }
+.cart-drawer-active { transform: translateX(0); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+
+/* ─── PRODUCT CARD HOVER ─────────────────── */
+.prod-card:hover .prod-image { transform: scale(1.04); }
+
+/* ─── FLOAT ANIMATION ────────────────────── */
+.float-1 { animation: float 4s ease-in-out infinite; }
+.float-2 { animation: float 4s ease-in-out 1s infinite; }
+.float-3 { animation: float 4s ease-in-out 0.5s infinite; }
+.float-4 { animation: float 4s ease-in-out 1.5s infinite; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ─── PULSE DOT ──────────────────────────── */
+.pulse-dot {
+  animation: pulseDot 1.5s ease-in-out infinite;
+}
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ─── SLIDE IN TOAST ─────────────────────── */
+.toast-slide {
+  animation: slideIn 0.3s ease forwards;
+}
+@keyframes slideIn {
+  from { transform: translateX(60px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+/* ─── ADMIN SIDEBAR ──────────────────────── */
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar { width: 240px; flex-shrink: 0; }
+.admin-main { flex: 1; overflow: auto; }
+
+@media (max-width: 768px) {
+  .admin-sidebar { display: none; }
+  .admin-main { width: 100%; }
+}
