@@ -2,13 +2,14 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { ProductCard } from '@/components/ProductCard';
 import { Product } from '@/types';
 import Link from 'next/link';
+import CountdownClient from '@/components/CountdownClient';
 
 const CAT_ICONS: Record<string, string> = {
   Steam: '🎮', PlayStation: '🎯', Xbox: '🟢', 'Riot Games': '⚡',
   Nintendo: '🔴', 'Gift Cards': '🎁', 'Marvel Games': '🦸', 'Battle.net': '💀',
 };
 
-export const revalidate = 60; // ISR — revalidate every 60s
+export const revalidate = 60;
 
 async function getProducts() {
   const [hotRes, newRes, catsRes] = await Promise.all([
@@ -16,7 +17,7 @@ async function getProducts() {
     supabaseAdmin.from('products').select('*').eq('active', true).eq('badge', 'New').order('created_at', { ascending: false }).limit(4),
     supabaseAdmin.from('products').select('category').eq('active', true),
   ]);
-  const cats = [...new Set((catsRes.data ?? []).map((r: { category: string }) => r.category))].sort();
+  const cats = Array.from(new Set((catsRes.data ?? []).map((r: { category: string }) => r.category))).sort();
   return { hot: hotRes.data ?? [], newArrivals: newRes.data ?? [], cats };
 }
 
@@ -25,7 +26,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* ─── TICKER ─── */}
+      {/* TICKER */}
       <div className="bg-accent text-black font-heading text-xs font-bold tracking-widest overflow-hidden h-8 flex items-center">
         <div className="ticker-track">
           {['INSTANT DELIVERY','STEAM · PLAYSTATION · XBOX · RIOT GAMES','FREE DELIVERY OVER 2000 EGP','ALL REGIONS AVAILABLE','SECURE PAYMENT','24/7 SUPPORT','INSTANT DELIVERY','STEAM · PLAYSTATION · XBOX · RIOT GAMES','FREE DELIVERY OVER 2000 EGP','ALL REGIONS AVAILABLE','SECURE PAYMENT','24/7 SUPPORT'].map((t, i) => (
@@ -34,13 +35,10 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* ─── HERO ─── */}
+      {/* HERO */}
       <section className="relative min-h-[88vh] flex items-center px-10 md:px-20 overflow-hidden">
-        {/* Background */}
         <div className="absolute inset-0 hero-grid-bg" />
         <div className="absolute inset-0" style={{background:'radial-gradient(ellipse 60% 80% at 65% 50%, rgba(0,212,255,.08) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(124,58,237,.12) 0%, transparent 60%)'}} />
-
-        {/* Content */}
         <div className="relative z-10 max-w-xl">
           <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/30 text-accent font-heading text-xs tracking-widest px-4 py-1.5 rounded-sm mb-8 uppercase">
             <span className="pulse-dot text-[8px]">●</span> NOW IN STOCK — DROP 2026
@@ -60,13 +58,11 @@ export default async function HomePage() {
             </Link>
           </div>
         </div>
-
-        {/* Floating mini cards */}
         {hot.slice(0, 4).map((p: Product, i: number) => (
           <Link key={p.id} href="/products"
-            className={`hidden xl:block absolute right-20 bg-card border border-border rounded-lg overflow-hidden w-36 hover:border-accent/30 transition-all float-${i + 1}`}
+            className={`hidden xl:block absolute bg-card border border-border rounded-lg overflow-hidden w-36 hover:border-accent/30 transition-all float-${i + 1}`}
             style={{ top: `${20 + (i % 2) * 28}%`, right: `${8 + Math.floor(i / 2) * 11}%` }}>
-            <img src={p.image_url || ''} alt={p.name} className="w-full aspect-[3/4] object-cover" onError={() => {}} />
+            <img src={p.image_url || ''} alt={p.name} className="w-full aspect-[3/4] object-cover" />
             <div className="p-2">
               <div className="font-heading text-[10px] text-gwhite font-semibold truncate">{p.name.split(' — ')[0]}</div>
               <div className="text-accent text-xs font-bold mt-0.5">{p.price.toFixed(2)} EGP</div>
@@ -75,8 +71,8 @@ export default async function HomePage() {
         ))}
       </section>
 
-      {/* ─── CATEGORY PILLS ─── */}
-      <div className="flex gap-3 overflow-x-auto px-10 pb-14 -mt-4 scrollbar-none" style={{scrollbarWidth:'none'}}>
+      {/* CATEGORY PILLS */}
+      <div className="flex gap-3 overflow-x-auto px-10 pb-14 -mt-4" style={{scrollbarWidth:'none'}}>
         {cats.map((cat) => (
           <Link key={cat} href={`/products?cat=${encodeURIComponent(cat)}`}
             className="flex-shrink-0 flex items-center gap-2.5 bg-card border border-border text-gtext font-heading text-xs font-semibold tracking-widest px-6 py-3 rounded hover:border-accent hover:text-accent transition-all hover:-translate-y-0.5 uppercase">
@@ -85,7 +81,7 @@ export default async function HomePage() {
         ))}
       </div>
 
-      {/* ─── FLASH SALE BANNER ─── */}
+      {/* FLASH SALE BANNER */}
       <div className="mx-10 mb-16 bg-card border border-border rounded-lg p-10 flex flex-wrap items-center justify-between gap-8 relative overflow-hidden">
         <div className="absolute right-0 top-0 bottom-0 w-1/2" style={{background:'radial-gradient(ellipse at right, rgba(0,212,255,.1), transparent)'}} />
         <div className="relative">
@@ -95,10 +91,10 @@ export default async function HomePage() {
             View All Deals →
           </Link>
         </div>
-        <CountdownTimer hours={48} />
+        <CountdownClient hours={48} />
       </div>
 
-      {/* ─── HOT PRODUCTS ─── */}
+      {/* HOT PRODUCTS */}
       <section className="px-10 pb-16">
         <div className="flex items-end justify-between mb-10">
           <div>
@@ -112,7 +108,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── NEW ARRIVALS ─── */}
+      {/* NEW ARRIVALS */}
       <section className="px-10 pb-20">
         <div className="flex items-end justify-between mb-10">
           <div>
@@ -126,8 +122,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ─── FEATURES ─── */}
-      <div className="mx-10 mb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-lg overflow-hidden border border-border" style={{background:'var(--border)',gap:'1px'}}>
+      {/* FEATURES */}
+      <div className="mx-10 mb-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 rounded-lg overflow-hidden border border-border" style={{gap:'1px', background:'#1E2836'}}>
         {[
           { icon: '⚡', title: 'Instant Delivery',  desc: 'Keys sent to your email within minutes' },
           { icon: '🌍', title: 'All Regions',       desc: 'Global, EU, NA, ME, Turkey, Egypt & more' },
@@ -146,15 +142,3 @@ export default async function HomePage() {
     </>
   );
 }
-
-// ─── CLIENT COUNTDOWN ─────────────────────────────────────────────
-function CountdownTimer({ hours }: { hours: number }) {
-  return (
-    <div className="relative" id="countdown-wrapper">
-      <CountdownClient hours={hours} />
-    </div>
-  );
-}
-
-// Inline client component for the countdown
-import CountdownClient from '@/components/CountdownClient';
